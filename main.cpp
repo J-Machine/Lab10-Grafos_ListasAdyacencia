@@ -3,248 +3,248 @@
 
 using namespace std;
 
-template<class V, class E>  
-class Edge;                 // prototipo declarado aqui para evitar error al usarlo en Vertex
+template <class V, class E>
+class Edge; // prototipo declarado aqui para evitar error al usarlo en Vertex
 
-template<class V, class E>
-class Vertex //Clase vertice
+template <class V, class E>
+class Vertex // Clase vertice
 {
-    public:
-        V m_Dato; //Nombre del vertice
-        list< Edge <V,E> > m_Aristas; //Lista de objetos aristas que tienen un puntero a otro vertice
-    public:
-       Vertex(V d):m_Dato{d}{}
-       Vertex(){}
-       ~Vertex(){}
+public:
+    V m_Dato;                   // Nombre del vertice
+    list<Edge<V, E>> m_Aristas; // Lista de objetos aristas que tienen un puntero a otro vertice
+public:
+    Vertex(V d) : m_Dato{d} {}
+    Vertex() {}
+    ~Vertex() {}
 };
 
-template<class V, class E>
-class Edge { //Clase arista 
-    public:
-        E m_Dato; //Nombre de arista
-        Vertex<V,E> * m_pVertex; //Puntero a otro vertice
-    public:
-        Edge(E name , Vertex<V,E> * p = 0):m_Dato{name} , m_pVertex{p}{}
-        Edge(){}
-        ~Edge(){
-            m_pVertex = 0;
-        }
-    
+template <class V, class E>
+class Edge
+{
+public:
+    E m_Dato;                // Nombre de arista
+    Vertex<V, E> *m_pVertex; // Puntero a otro vertice
+public:
+    Edge(E name, Vertex<V, E> *p = 0) : m_Dato{name}, m_pVertex{p} {}
+    Edge() {}
+    ~Edge()
+    {
+        m_pVertex = 0;
+    }
 };
 
-template<class V, class E>
-class Grafo 
+template <class V, class E>
+class Grafo
 {
-    private: 
-        list<Vertex<V,E>> m_Grafo;
-    public:
-        Grafo(){}
-        /////////////////////CREAR GRAFO////////////////////////        
-        void crearGrafo() 
+private:
+    list<Vertex<V, E>> m_Grafo;
+
+public:
+    Grafo() {}
+    /////////////////////CREAR GRAFO////////////////////////
+    void crearGrafo()
+    {
+        if (!m_Grafo.empty())
+            m_Grafo.clear();
+        cout << "Grafo Vacio Creado";
+    }
+    /////////////////////INSERTAR NODO////////////////////////
+    void insertarNodo(V valor)
+    {
+        Vertex<V, E> newNodo(valor);
+        if (!existeNodo(newNodo))
+            m_Grafo.push_back(newNodo);
+        else
+            cout << "No se insertó. El nodo ya existe\n";
+    }
+    /////////////////////INSERTAR ARISTA////////////////////////
+    void insertarArista(V a, V b, E arista)
+    {
+        Vertex<V, E> *p = existeNodo(a);
+        Vertex<V, E> *q = existeNodo(b);
+        if (p && q)
         {
-            if(!m_Grafo.empty()) m_Grafo.clear();
-            cout<<"Grafo Vacio Creado";
+            p->m_Aristas.push_back(Edge<V, E>(arista, q));
+            q->m_Aristas.push_back(Edge<V, E>(arista, p));
         }
-        /////////////////////INSERTAR NODO//////////////////////// 
-        void insertarNodo(V valor) 
+        else if (!p)
         {
-            Vertex<V,E> newNodo(valor);
-            if (!existeNodo(newNodo))
-                m_Grafo.push_back(newNodo);
-            else
-                cout << "No se insertó. El nodo ya existe\n";
+            insertarNodo(a);
+            p = existeNodo(a);
+            p->m_Aristas.push_back(Edge<V, E>(arista, q));
+            q->m_Aristas.push_back(Edge<V, E>(arista, p));
         }
-        /////////////////////INSERTAR ARISTA//////////////////////// 
-        void insertarArista(V a ,V b,E arista) 
+        else
         {
-            Vertex<V,E> * p  =  existeNodo(a);
-            Vertex<V,E> * q  =  existeNodo(b);
-            if(p && q){
-                p->m_Aristas.push_back(Edge<V,E>(arista,q));
-                q->m_Aristas.push_back(Edge<V,E>(arista,p));
-            }else if(!p)
+            insertarNodo(b);
+            q = existeNodo(b);
+            p->m_Aristas.push_back(Edge<V, E>(arista, q));
+            q->m_Aristas.push_back(Edge<V, E>(arista, p));
+        }
+    }
+    /////////////////////BORRAR NODO////////////////////////
+    void borrarNodo(V x) // si se borra un nodo, se borran las aristas vinculadas -> Jenny
+    {
+        for (auto it = m_Grafo.begin(); it != m_Grafo.end(); it++)
+        {
+            if ((*it).m_Dato == x)
             {
-                insertarNodo(a);
-                p = existeNodo(a);
-                p->m_Aristas.push_back(Edge<V,E>(arista,q));
-                q->m_Aristas.push_back(Edge<V,E>(arista,p));
-            }else{
-                insertarNodo(b);
-                q = existeNodo(b);
-                p->m_Aristas.push_back(Edge<V,E>(arista,q));
-                q->m_Aristas.push_back(Edge<V,E>(arista,p));
-            }
-        }
-        /////////////////////BORRAR NODO//////////////////////// 
-        void borrarNodo(V x) // si se borra un nodo, se borran las aristas vinculadas -> Jenny
-        {
-                for(auto it =  m_Grafo.begin(); it != m_Grafo.end() ; it++)
+                for (auto it_2 = (*it).m_Aristas.begin(); it_2 != (*it).m_Aristas.end(); ++it_2)
                 {
-                    if((*it).m_Dato == x) 
+                    for (auto iman = m_Grafo.begin(); iman != m_Grafo.end(); iman++)
                     {
-                        for(auto it_2 = (*it).m_Aristas.begin() ; it_2 != (*it).m_Aristas.end() ; ++it_2)
+                        if ((*iman).m_Dato == (*it_2).m_pVertex->m_Dato)
                         {
-                            for(auto iman =  m_Grafo.begin(); iman != m_Grafo.end() ; iman++)
+                            for (auto it_3 = (*iman).m_Aristas.begin(); it_3 != (*iman).m_Aristas.end(); ++it_3)
                             {
-                                if((*iman).m_Dato == (*it_2).m_pVertex->m_Dato) 
+                                if ((*it_3).m_pVertex->m_Dato == x)
                                 {
-                                    for(auto it_3 = (*iman).m_Aristas.begin() ; it_3 != (*iman).m_Aristas.end() ; ++it_3)
-                                    { 
-                                            if((*it_3).m_pVertex->m_Dato == x)  {
-                                                it_3 = (*iman).m_Aristas.erase(it_3);
-                                                break;
-                                            }
-
-                                    }
+                                    it_3 = (*iman).m_Aristas.erase(it_3);
                                     break;
                                 }
                             }
-                            it_2 = (*it).m_Aristas.erase(it_2);
+                            break;
                         }
-                        it  = m_Grafo.erase(it);
-                        return;
                     }
+                    it_2 = (*it).m_Aristas.erase(it_2);
                 }
-                cout<<endl;
+                it = m_Grafo.erase(it);
+                return;
+            }
         }
-        /////////////////////BORRAR ARISTA//////////////////////// 
-        void borrarArista(V  a , V  b) 
+        cout << endl;
+    }
+    /////////////////////BORRAR ARISTA////////////////////////
+    void borrarArista(V a, V b)
+    {
+        Vertex<V, E> *p = existeNodo(a);
+        Vertex<V, E> *q = existeNodo(b);
+        if (p && q)
         {
-            Vertex<V,E> * p  =  existeNodo(a);
-            Vertex<V,E> * q  =  existeNodo(b);
-            if(p && q)
+            for (auto it_3 = p->m_Aristas.begin(); it_3 != p->m_Aristas.end(); it_3++)
             {
-                for(auto it_3 = p->m_Aristas.begin() ; it_3 != p->m_Aristas.end(); it_3++)
+                if ((*it_3).m_pVertex->m_Dato == b)
                 {
-                    if((*it_3).m_pVertex->m_Dato == b)  {
-                        it_3 = p->m_Aristas.erase(it_3);
-                        break;
-                    }
+                    it_3 = p->m_Aristas.erase(it_3);
+                    break;
                 }
+            }
 
-                for(auto it_4 = q->m_Aristas.begin() ; it_4 != q->m_Aristas.end(); it_4++)
+            for (auto it_4 = q->m_Aristas.begin(); it_4 != q->m_Aristas.end(); it_4++)
+            {
+                if ((*it_4).m_pVertex->m_Dato == a)
                 {
-                    if((*it_4).m_pVertex->m_Dato == a)  {
-                        it_4 = p->m_Aristas.erase(it_4);
-                        break;
-                    }
+                    it_4 = p->m_Aristas.erase(it_4);
+                    break;
                 }
             }
         }
-        /////////////////////ES VACIO//////////////////////// 
-        bool esVacio()
+    }
+    /////////////////////ES VACIO////////////////////////
+    bool esVacio()
+    {
+        if (m_Grafo.empty())
+            return true;
+        return false;
+    }
+    /////////////////////EXISTE NODO////////////////////////
+    bool existeNodo(Vertex<V, E> p)
+    {
+        for (auto it = m_Grafo.begin(); it != m_Grafo.end(); it++)
         {
-            if(m_Grafo.empty()) 
+            if ((*it).m_Dato == p.m_Dato)
                 return true;
-            return false;
-            
         }
-        /////////////////////EXISTE NODO//////////////////////// 
-        bool existeNodo(Vertex<V,E>  p)
-        {
-            for(auto it = m_Grafo.begin() ; it != m_Grafo.end() ; it++)
-            {
-                if((*it).m_Dato == p.m_Dato) return true;
-            }
-            return false;
-        }
+        return false;
+    }
 
-        Vertex<V,E> * existeNodo( V p )
+    Vertex<V, E> *existeNodo(V p)
+    {
+        for (auto it = m_Grafo.begin(); it != m_Grafo.end(); it++)
         {
-            for(auto it =  m_Grafo.begin(); it != m_Grafo.end() ; it++)
-            {
-                if((*it).m_Dato == p) return &(*it); 
-            }
+            if ((*it).m_Dato == p)
+                return &(*it);
         }
+    }
 
-        /////////////////////SON ADYACENTES//////////////////////// 
-        bool sonAdyacentes(V  a,V b) // si existe una arista entre 2 nodos
+    /////////////////////SON ADYACENTES////////////////////////
+    bool sonAdyacentes(V a, V b) // si existe una arista entre 2 nodos
+    {
+        for (auto it = m_Grafo.begin(); it != m_Grafo.end(); it++)
         {
-            for(auto it = m_Grafo.begin() ; it != m_Grafo.end() ; it++)
+            if ((*it).m_Dato == a)
             {
-                if((*it).m_Dato==a){
 
-                    for(auto it_2 = (*it).m_Aristas.begin() ; it_2 != (*it).m_Aristas.end() ; ++it_2)
-                    {
-                        if((*it_2).m_pVertex->m_Dato==b){
-                            return true;
-                        }
-                    }  
-                    return false;  
-                }
-            }
-        }
-        /////////////////////VER ADYACENCIAS//////////////////////// 
-        void verAdyacencia() // Imprime matriz o lista de adyacencias
-        {
-            for(auto it = m_Grafo.begin() ; it != m_Grafo.end() ; it++)
-            {
-                cout<<(*it).m_Dato<<"->";
-                for(auto it_2 = (*it).m_Aristas.begin() ; it_2 != (*it).m_Aristas.end() ; ++it_2)
+                for (auto it_2 = (*it).m_Aristas.begin(); it_2 != (*it).m_Aristas.end(); ++it_2)
                 {
-                    cout<<(*it_2).m_pVertex->m_Dato<<"("<<(*it_2).m_Dato<<")->";
-                }
-                cout<<endl;
-            }
-        }
-
-        /////////////////////GRAFICAR GRAFO//////////////////////// 
-        void graficar()
-        {
-            ofstream arch;
-            arch.open("grafo_adyacencia.dot");
-            if(arch.is_open()){
-                arch<<"strict graph A { \n";
-                for(auto it = m_Grafo.begin() ; it != m_Grafo.end() ; it++)
-                {
-                    arch<<(*it).m_Dato<<endl;
-                    for(auto it_2 = (*it).m_Aristas.begin() ; it_2 != (*it).m_Aristas.end() ; ++it_2)
+                    if ((*it_2).m_pVertex->m_Dato == b)
                     {
-                        arch<<(*it).m_Dato<<"--"<<(*it_2).m_pVertex->m_Dato<<"[label="<<(*it_2).m_Dato<<"]"<<endl;
+                        return true;
                     }
                 }
-                arch<<"}\n";
-                arch.close();
-                system("dot -Tpng grafo_adyacencia.dot -o grafo_adyacencia.png ");
-            }else {
-                cout<<"error al crear archivo";
+                return false;
             }
         }
+    }
+    /////////////////////VER ADYACENCIAS////////////////////////
+    void verAdyacencia() // Imprime lista de adyacencias
+    {
+        for (auto it = m_Grafo.begin(); it != m_Grafo.end(); it++)
+        {
+            cout << (*it).m_Dato << " => ";
+            for (auto it_2 = (*it).m_Aristas.begin(); it_2 != (*it).m_Aristas.end(); ++it_2)
+            {
+                // cout << (*it_2).m_pVertex->m_Dato << "(" << (*it_2).m_Dato << ")->";
+                cout << (*it_2).m_pVertex->m_Dato << "->";
+            }
+            cout << endl;
+        }
+    }
 
+    /////////////////////GRAFICAR GRAFO////////////////////////
+    void graficar()
+    {
+        ofstream arch;
+        arch.open("D:\\Graphviz\\bin\\graphL10.dot");
+        if (arch.is_open())
+        {
+            arch << "strict graph A { \n";
+            for (auto it = m_Grafo.begin(); it != m_Grafo.end(); it++)
+            {
+                arch << (*it).m_Dato << endl;
+                for (auto it_2 = (*it).m_Aristas.begin(); it_2 != (*it).m_Aristas.end(); ++it_2)
+                {
+                    arch << (*it).m_Dato << "--" << (*it_2).m_pVertex->m_Dato << "[label=" << (*it_2).m_Dato << "]" << endl;
+                }
+            }
+            arch << "}\n";
+            arch.close();
+            system("dot -Tpng D:\\Graphviz\\bin\\graphL10.dot -o D:\\Graphviz\\bin\\graphL10.png ");
+        }
+        else
+        {
+            cout << "error al crear archivo";
+        }
+    }
 };
 
-int main() 
+int main()
 {
-   Grafo<string, int> G;
-   /////// Zona de Pruebas //////////
-   G.crearGrafo();
-   G.insertarNodo("Arequipa");
-   G.insertarNodo("Lima");
-   G.insertarNodo("Cuzco");
-   G.insertarNodo("Puno");
-   G.insertarNodo("Ica");
-   G.insertarArista("Arequipa","Cuzco",250);
-   G.insertarArista("Arequipa","Puno",200);
-   G.insertarArista("Lima","Ica",100);
-   G.insertarArista("Lima","Arequipa",160);
-   cout<<(G.sonAdyacentes("Lima","Ica") ? "Adyacentes" : "No Adyacentes") << endl;
-   cout<<(G.esVacio() ? "El grafo esta vacio" : "El grafo no esta vacio") << endl;
-   G.borrarArista("Arequipa","Cuzco");
-   G.verAdyacencia();
-   //G.graficar();
-   /////////////// Fin Zona de Pruebas //////////////
+    cout << endl;
+    cout << "REPRESENTACIÓN DE GRAFOS \n------------------------";
 
-    cout<<"-----------"<<endl;
-    
+    Grafo<string, int> G;
     string r, s;
     string ciud;
     string v1, v2;
     string vErase;
     string nodo_ciud;
-    int a,b;
+    Vertex<string, int> v_ciud;
+    int a, b;
+
     do
     {
-        cout<<endl;
+        cout << endl;
         cout << "\nMENU\n";
         cout << "1) Crear grafo\n"; // grafo vacío
         cout << "2) Insertar nodo \n";
@@ -260,61 +260,62 @@ int main()
         cin >> a;
         switch (a)
         {
-            case 1:
-                G.crearGrafo();
-                cout <<"- Se creó el grafo vacío\n";
+        case 1:
+            G.crearGrafo();
+            break;
+        case 2:
+            cout << "- Inserte el valor de nodo: ";
+            cin >> ciud;
+            G.insertarNodo(ciud);
+            break;
+        case 3:
+            cout << "- Ingrese primer nodo: ";
+            cin >> v1;
+            cout << "- Ingrese segundo nodo: ";
+            cin >> v2;
+            // int e;
+            // cout << "- Inserte peso de la arista: "; // int
+            // cin >> e;
+            G.insertarArista(v1, v2, 0);
+            break;
+        case 4:
+            cout << "- Ingrese el nodo a eliminar: ";
+            cin >> vErase;
+            G.borrarNodo(vErase);
+            break;
+        case 5:
+            cout << (G.esVacio() ? "- El grafo está vacío\n" : "- El grafo no está vacío\n");
+            break;
+        case 6:
+            cout << "- Ingrese el valor de nodo a comprobar: ";
+            cin >> nodo_ciud;
+            v_ciud.m_Dato = nodo_ciud;
+            cout << (G.existeNodo(v_ciud) ? "Si existe\n" : "No existe\n");
+            break;
+        case 7:
+            cout << "- Ingrese primer nodo: ";
+            cin >> r;
+            cout << "- Ingrese segundo nodo: ";
+            cin >> s;
+            cout << (G.sonAdyacentes(r, s) ? " Adyacentes" : "No Adyacentes") << endl;
+            break;
+        case 8:
+            G.verAdyacencia();
+            break;
+        case 9:
+            G.graficar();
+            break;
+        case 10:
+            cout << endl;
+            cout << "\n- Seguro que quiere salir?(SI=1)(NO=0) :";
+            cin >> b;
+            cout << endl;
+            if (b == 1)
+                a = 0;
+            else if (b == 0)
                 break;
-            case 2:
-                
-                cout << "- Inserte el valor del vértice:"; // string
-                cin >> ciud;
-                G.insertarNodo(ciud);
-                break;
-            case 3: // Insertar arista
-                
-                cout <<"- Ingrese primer vertice: "; cin>>v1;
-                cout <<"- Ingrese segundo vertice: ";cin>>v2;
-                int e;
-                cout << "- Inserte el valor de la arista: "; // int
-                cin>>e;
-                G.insertarArista(v1, v2, e);
-                break;
-            case 4:
-                
-                cout << "- Ingrese el valor de vertice a eliminar: "; // string
-                cin>>vErase;
-                G.borrarNodo(vErase);
-                break;
-            case 5:
-                cout << (G.esVacio()) ? "- El grafo está vacío\n" :"- El grafo no está vacío\n" ;
-                break;
-            case 6: // Existe nodo
-                cout << "- Ingrese el valor de nodo a comprobar: "; cin >>nodo_ciud;
-                cout << G.existeNodo(nodo_ciud) ? "- Si existe\n" :"- No existe\n" ;
-                break;
-            case 7:
-                cout<<"- Ingrese primer vertice: ";cin>>r;
-                cout<<"- Ingrese segundo vertice: ";cin>>s;
-                cout<<(G.sonAdyacentes(r,s) ? "* Son adyacentes" : "* No son a7dyacentes") << endl;
-                break;
-            case 8:
-                cout<<"LISTAS DE ADYACENCIA";cin>>r;
-                G.verAdyacencia();               
-                break;
-            case 9:
-                G.graficar();
-                break;
-            case 10:
-                cout << endl;
-                cout << "\n- Seguro que quiere salir?(SI=1)(NO=0) :";
-                cin >> b;
-                cout << endl;
-                if (b == 1)
-                    a = 0;
-                else if(b == 0)
-                    break;
         }
     } while (a != 0);
-    
+
     return 0;
 }
