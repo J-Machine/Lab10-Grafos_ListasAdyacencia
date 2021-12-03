@@ -208,7 +208,9 @@ public:
                 arch << (*it).m_Dato << endl;
                 for (auto it_2 = (*it).m_Aristas.begin(); it_2 != (*it).m_Aristas.end(); ++it_2)
                 {
-                    arch << (*it).m_Dato << "--" << (*it_2).m_pVertex->m_Dato << "[label=" << (*it_2).m_Dato << "]" << endl;
+                    // Descomentar para ver pesos de aristas
+                    // arch << (*it).m_Dato << "--" << (*it_2).m_pVertex->m_Dato << "[label=" << (*it_2).m_Dato << "]" << endl;
+                    arch << (*it).m_Dato << "--" << (*it_2).m_pVertex->m_Dato << endl;
                 }
             }
             arch << "}\n";
