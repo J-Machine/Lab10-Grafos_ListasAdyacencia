@@ -67,19 +67,9 @@ public:
             p->m_Aristas.push_back(Edge<V, E>(arista, q));
             q->m_Aristas.push_back(Edge<V, E>(arista, p));
         }
-        else if (!p)
-        {
-            insertarNodo(a);
-            p = existeNodo(a);
-            p->m_Aristas.push_back(Edge<V, E>(arista, q));
-            q->m_Aristas.push_back(Edge<V, E>(arista, p));
-        }
         else
         {
-            insertarNodo(b);
-            q = existeNodo(b);
-            p->m_Aristas.push_back(Edge<V, E>(arista, q));
-            q->m_Aristas.push_back(Edge<V, E>(arista, p));
+            cout << "No existe algun vertice para insertar la arista";
         }
     }
     /////////////////////BORRAR NODO////////////////////////
@@ -89,17 +79,18 @@ public:
         {
             if ((*it).m_Dato == x)
             {
-                for (auto it_2 = (*it).m_Aristas.begin(); it_2 != (*it).m_Aristas.end(); ++it_2)
+                auto it_2 = (*it).m_Aristas.begin();
+                while (it_2 != (*it).m_Aristas.end())
                 {
                     for (auto iman = m_Grafo.begin(); iman != m_Grafo.end(); iman++)
                     {
                         if ((*iman).m_Dato == (*it_2).m_pVertex->m_Dato)
                         {
-                            for (auto it_3 = (*iman).m_Aristas.begin(); it_3 != (*iman).m_Aristas.end(); ++it_3)
+                            for (auto it_3 = (*iman).m_Aristas.begin(); it_3 != (*iman).m_Aristas.end(); it_3++)
                             {
                                 if ((*it_3).m_pVertex->m_Dato == x)
                                 {
-                                    it_3 = (*iman).m_Aristas.erase(it_3);
+                                    auto ito = (*iman).m_Aristas.erase(it_3);
                                     break;
                                 }
                             }
@@ -108,7 +99,8 @@ public:
                     }
                     it_2 = (*it).m_Aristas.erase(it_2);
                 }
-                it = m_Grafo.erase(it);
+                if (it != m_Grafo.end())
+                    it = m_Grafo.erase(it);
                 return;
             }
         }
@@ -165,6 +157,7 @@ public:
             if ((*it).m_Dato == p)
                 return &(*it);
         }
+        return 0;
     }
 
     /////////////////////SON ADYACENTES////////////////////////
@@ -194,6 +187,7 @@ public:
             cout << (*it).m_Dato << " => ";
             for (auto it_2 = (*it).m_Aristas.begin(); it_2 != (*it).m_Aristas.end(); ++it_2)
             {
+                // Descomentar para ver peso de arista
                 // cout << (*it_2).m_pVertex->m_Dato << "(" << (*it_2).m_Dato << ")->";
                 cout << (*it_2).m_pVertex->m_Dato << "->";
             }
