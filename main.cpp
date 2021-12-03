@@ -27,10 +27,7 @@ public:
 public:
     Edge(E name, Vertex<V, E> *p = 0) : m_Dato{name}, m_pVertex{p} {}
     Edge() {}
-    ~Edge()
-    {
-        m_pVertex = 0;
-    }
+    ~Edge() {}
 };
 
 template <class V, class E>
@@ -62,18 +59,37 @@ public:
     {
         Vertex<V, E> *p = existeNodo(a);
         Vertex<V, E> *q = existeNodo(b);
-        if (p && q)
+        if (p && q && (p != q))
         {
-            p->m_Aristas.push_back(Edge<V, E>(arista, q));
-            q->m_Aristas.push_back(Edge<V, E>(arista, p));
+            if (!existeArista(p, q))
+            {
+                p->m_Aristas.push_back(Edge<V, E>(arista, q));
+                q->m_Aristas.push_back(Edge<V, E>(arista, p));
+            }
+            else
+            {
+                cout << "Ya existe Arista";
+            }
         }
         else
         {
-            cout << "No existe algun vertice para insertar la arista";
+            cout << "No existe algun vertice para insertar la arista o esta insertando un ciclo";
         }
     }
+
+    bool existeArista(Vertex<V, E> *p, Vertex<V, E> *q)
+    {
+        for (auto it_3 = p->m_Aristas.begin(); it_3 != p->m_Aristas.end(); it_3++)
+        {
+            if ((*it_3).m_pVertex == q)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
     /////////////////////BORRAR NODO////////////////////////
-    void borrarNodo(V x) // si se borra un nodo, se borran las aristas vinculadas -> Jenny
+    void borrarNodo(V x)
     {
         for (auto it = m_Grafo.begin(); it != m_Grafo.end(); it++)
         {
@@ -99,8 +115,7 @@ public:
                     }
                     it_2 = (*it).m_Aristas.erase(it_2);
                 }
-                if (it != m_Grafo.end())
-                    it = m_Grafo.erase(it);
+                it = m_Grafo.erase(it);
                 return;
             }
         }
@@ -216,11 +231,18 @@ public:
             arch << "}\n";
             arch.close();
             system("dot -Tpng D:\\Graphviz\\bin\\graphL10.dot -o D:\\Graphviz\\bin\\graphL10.png ");
+            system("D:\\Graphviz\\bin\\graphL10.png ");
         }
         else
         {
             cout << "error al crear archivo";
         }
+    }
+
+    ~Grafo()
+    {
+        m_Grafo.clear();
+        cout << "vaciado";
     }
 };
 
@@ -252,6 +274,7 @@ int main()
         cout << "8) Ver adyacencias \n";
         cout << "9) Graficar grafo \n";
         cout << "10) SALIR\n";
+        cout << "11) Eliminar arista \n";
         cout << "\nIngrese la opcion: ";
         cin >> a;
         switch (a)
@@ -310,6 +333,13 @@ int main()
                 a = 0;
             else if (b == 0)
                 break;
+        case 11:
+            cout << "- Ingrese primer nodo: ";
+            cin >> r;
+            cout << "- Ingrese segundo nodo: ";
+            cin >> s;
+            G.borrarArista(r, s);
+            break;
         }
     } while (a != 0);
 
